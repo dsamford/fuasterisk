@@ -24,3 +24,7 @@ RUN git clone https://github.com/chan-sccp/chan-sccp.git /usr/src/chan-sccp && \
     ./configure --with-asterisk=/usr && \
     make && \
     make install
+
+# Create the directory and copy asterisk-scripts
+RUN mkdir -p /asterisk_scripts
+COPY ./asterisk-scripts/ /asterisk_scripts/
