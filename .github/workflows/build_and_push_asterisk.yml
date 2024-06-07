@@ -114,9 +114,9 @@ jobs:
       - name: Update current chan-sccp release in GitHub secrets
         if: env.update_chan_sccp_release == 'true' && steps.docker_build.outcome == 'success'
         run: |
-          gh secret set CURRENT_CHAN_SCCP_RELEASE --body "${{ env.latest_release }}" --repo $GITHUB_REPOSITORY
+          echo "${{ env.latest_release }}" | gh secret set CURRENT_CHAN_SCCP_RELEASE --repo $GITHUB_REPOSITORY
 
       - name: Update current mlan/asterisk:mini image in GitHub secrets
         if: env.update_mlan_asterisk_mini_image == 'true' && steps.docker_build.outcome == 'success'
         run: |
-          gh secret set CURRENT_MLAN_ASTERISK_MINI_IMAGE --body "${{ env.latest_image }}" --repo $GITHUB_REPOSITORY
+          echo "${{ env.latest_image }}" | gh secret set CURRENT_MLAN_ASTERISK_MINI_IMAGE --repo $GITHUB_REPOSITORY
