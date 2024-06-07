@@ -1,6 +1,6 @@
 FROM mlan/asterisk:mini
 
-# Install dependencies
+# Install necessary packages
 RUN apk update && apk add --no-cache \
     build-base \
     linux-headers \
@@ -15,7 +15,8 @@ RUN apk update && apk add --no-cache \
     libtool \
     bash \
     unixodbc \
-    unixodbc-dev
+    unixodbc-dev \
+    asterisk-dev
 
 # Clone, build, and install chan_sccp
 RUN git clone https://github.com/chan-sccp/chan-sccp.git /usr/src/chan-sccp && \
