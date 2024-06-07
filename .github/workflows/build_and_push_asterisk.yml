@@ -50,7 +50,7 @@ jobs:
       - name: Update chan-sccp release if necessary
         id: update_chan_sccp_release
         run: |
-          if [ "${{ env.latest_release }}" != "${{ env.current_release }}" ]; then
+          if [ "${{ env.latest_release }}" != "none" ] && [ "${{ env.latest_release }}" != "${{ env.current_release }}" ]; then
             echo "Updating chan-sccp to version ${{ env.latest_release }}"
             echo "latest_release=${{ env.latest_release }}" >> $GITHUB_ENV
             echo "update_chan_sccp_release=true" >> $GITHUB_ENV
@@ -84,14 +84,29 @@ jobs:
             echo "No new mlan/asterisk:mini image"
             echo "update_mlan_asterisk_mini_image=false" >> $GITHUB_ENV
 
+      - name: Check if Dockerfile has changed
+        id: check_dockerfile_changed
+        run: |
+          if [ "$(git diff --name-only HEAD^ | grep Dockerfile)" ]; then
+            echo "Dockerfile has changed"
+            echo "dockerfile_changed=true" >> $GITHUB_ENV
+          else
+            echo "Dockerfile has not changed"
+            echo "dockerfile_changed=false" >> $GITHUB_ENV
+
       - name: Build and push Docker image
-        if: env.update_chan_sccp_release == 'true' || env.update_mlan_asterisk_mini_image == 'true'
+        if: env.update_chan_sccp_release == 'true' || env.update_mlan_asterisk_mini_image == 'true' || env.dockerfile_changed == 'true'
         uses: docker/build-push-action@v3
         with:
           context: .
           file: Dockerfile
           push: true
           tags: registry.gitlab.com/futelecom/furegistry/asterisk-sccpb:latest
+          build-args: |
+            MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+            MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}
+            MYSQL_USER=${{ secrets.MYSQL_USER }}
+            MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
