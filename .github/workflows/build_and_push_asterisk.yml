@@ -5,9 +5,9 @@ on:
     branches:
       - main
     paths:
-      - '**.yml'
-      - '**.yaml'
-      - '**.Dockerfile'
+      - 'Dockerfile'
+  schedule:
+    - cron: '0 0 * * *' # This will run the workflow daily
   workflow_dispatch:
 
 jobs:
@@ -32,10 +32,76 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
+      - name: Get latest chan-sccp release
+        id: get_chan_sccp_release
+        run: |
+          latest_release=$(curl --silent "https://api.github.com/repos/chan-sccp/chan-sccp/releases/latest" | jq -r .tag_name)
+          echo "latest_release=$latest_release" >> $GITHUB_ENV
+
+      - name: Get current chan-sccp release from secrets
+        id: get_current_chan_sccp_release
+        run: |
+          current_release=${{ secrets.CURRENT_CHAN_SCCP_RELEASE }}
+          if [ -z "$current_release" ]; then
+            current_release="none"
+          fi
+          echo "current_release=$current_release" >> $GITHUB_ENV
+
+      - name: Update chan-sccp release if necessary
+        id: update_chan_sccp_release
+        run: |
+          if [ "${{ env.latest_release }}" != "${{ env.current_release }}" ]; then
+            echo "Updating chan-sccp to version ${{ env.latest_release }}"
+            echo "latest_release=${{ env.latest_release }}" >> $GITHUB_ENV
+            echo "update_chan_sccp_release=true" >> $GITHUB_ENV
+          else
+            echo "No new chan-sccp release"
+            echo "update_chan_sccp_release=false" >> $GITHUB_ENV
+
+      - name: Get latest mlan/asterisk:mini image
+        id: get_mlan_asterisk_mini_image
+        run: |
+          latest_image=$(docker pull mlan/asterisk:mini | grep 'Digest' | awk '{print $2}')
+          echo "latest_image=$latest_image" >> $GITHUB_ENV
+
+      - name: Get current mlan/asterisk:mini image from secrets
+        id: get_current_mlan_asterisk_mini_image
+        run: |
+          current_image=${{ secrets.CURRENT_MLAN_ASTERISK_MINI_IMAGE }}
+          if [ -z "$current_image" ]; then
+            current_image="none"
+          fi
+          echo "current_image=$current_image" >> $GITHUB_ENV
+
+      - name: Update mlan/asterisk:mini image if necessary
+        id: update_mlan_asterisk_mini_image
+        run: |
+          if [ "${{ env.latest_image }}" != "${{ env.current_image }}" ]; then
+            echo "Updating mlan/asterisk:mini to version ${{ env.latest_image }}"
+            echo "latest_image=${{ env.latest_image }}" >> $GITHUB_ENV
+            echo "update_mlan_asterisk_mini_image=true" >> $GITHUB_ENV
+          else
+            echo "No new mlan/asterisk:mini image"
+            echo "update_mlan_asterisk_mini_image=false" >> $GITHUB_ENV
+
       - name: Build and push Docker image
+        if: env.update_chan_sccp_release == 'true' || env.update_mlan_asterisk_mini_image == 'true'
         uses: docker/build-push-action@v3
         with:
           context: .
           file: Dockerfile
           push: true
           tags: registry.gitlab.com/futelecom/furegistry/asterisk-sccpb:latest
+
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
+
+      - name: Update current chan-sccp release in GitHub secrets
+        if: env.update_chan_sccp_release == 'true' && steps.docker_build.outcome == 'success'
+        run: |
+          gh secret set CURRENT_CHAN_SCCP_RELEASE --body "${{ env.latest_release }}" --repo $GITHUB_REPOSITORY
+
+      - name: Update current mlan/asterisk:mini image in GitHub secrets
+        if: env.update_mlan_asterisk_mini_image == 'true' && steps.docker_build.outcome == 'success'
+        run: |
+          gh secret set CURRENT_MLAN_ASTERISK_MINI_IMAGE --body "${{ env.latest_image }}" --repo $GITHUB_REPOSITORY
