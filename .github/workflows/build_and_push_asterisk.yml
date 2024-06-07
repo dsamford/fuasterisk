@@ -50,17 +50,20 @@ jobs:
       - name: Update chan-sccp release if necessary
         id: update_chan_sccp_release
         run: |
-            if [ "${{ env.latest_release }}" != "none" ]; then
-                if [ "${{ env.latest_release }}" != "${{ env.current_release }}" ]; then
-                    echo "Updating chan-sccp to version ${{ env.latest_release }}"
-                    echo "latest_release=${{ env.latest_release }}" >> $GITHUB_ENV
-                    echo "update_chan_sccp_release=true" >> $GITHUB_ENV
-                else
-                    echo "No new chan-sccp release"
-                    echo "update_chan_sccp_release=false" >> $GITHUB_ENV
-                fi
+          if [ "${{ env.latest_release }}" != "none" ]; then
+            if [ "${{ env.latest_release }}" != "${{ env.current_release }}" ]; then
+              echo "Updating chan-sccp to version ${{ env.latest_release }}"
+              echo "latest_release=${{ env.latest_release }}" >> $GITHUB_ENV
+              echo "update_chan_sccp_release=true" >> $GITHUB_ENV
+            else
+              echo "No new chan-sccp release"
+              echo "update_chan_sccp_release=false" >> $GITHUB_ENV
             fi
-            
+          else
+            echo "No new chan-sccp release"
+            echo "update_chan_sccp_release=false" >> $GITHUB_ENV
+          fi
+
       - name: Get latest mlan/asterisk:mini image
         id: get_mlan_asterisk_mini_image
         run: |
@@ -79,13 +82,19 @@ jobs:
       - name: Update mlan/asterisk:mini image if necessary
         id: update_mlan_asterisk_mini_image
         run: |
-          if [ "${{ env.latest_image }}" != "${{ env.current_image }}" ]; then
-            echo "Updating mlan/asterisk:mini to version ${{ env.latest_image }}"
-            echo "latest_image=${{ env.latest_image }}" >> $GITHUB_ENV
-            echo "update_mlan_asterisk_mini_image=true" >> $GITHUB_ENV
+          if [ "${{ env.latest_image }}" != "none" ]; then
+            if [ "${{ env.latest_image }}" != "${{ env.current_image }}" ]; then
+              echo "Updating mlan/asterisk:mini to version ${{ env.latest_image }}"
+              echo "latest_image=${{ env.latest_image }}" >> $GITHUB_ENV
+              echo "update_mlan_asterisk_mini_image=true" >> $GITHUB_ENV
+            else
+              echo "No new mlan/asterisk:mini image"
+              echo "update_mlan_asterisk_mini_image=false" >> $GITHUB_ENV
+            fi
           else
             echo "No new mlan/asterisk:mini image"
             echo "update_mlan_asterisk_mini_image=false" >> $GITHUB_ENV
+          fi
 
       - name: Check if Dockerfile has changed
         id: check_dockerfile_changed
