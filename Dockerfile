@@ -1,6 +1,6 @@
-# Dockerfile
 FROM mlan/asterisk:mini
 
+# Install dependencies
 RUN apk update && apk add --no-cache \
     build-base \
     linux-headers \
@@ -14,7 +14,8 @@ RUN apk update && apk add --no-cache \
     automake \
     libtool \
     bash \
-    asterisk-dev
+    unixodbc \
+    unixodbc-dev
 
 # Clone, build, and install chan_sccp
 RUN git clone https://github.com/chan-sccp/chan-sccp.git /usr/src/chan-sccp && \
@@ -22,6 +23,3 @@ RUN git clone https://github.com/chan-sccp/chan-sccp.git /usr/src/chan-sccp && \
     ./configure --with-asterisk=/usr && \
     make && \
     make install
-
-# Start Asterisk
-CMD ["asterisk", "-f"]
