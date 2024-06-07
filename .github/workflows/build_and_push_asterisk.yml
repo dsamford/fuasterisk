@@ -60,6 +60,7 @@ jobs:
               echo "update_chan_sccp_release=false" >> $GITHUB_ENV
             fi
           fi
+          fi
 
       - name: Get latest mlan/asterisk:mini image
         id: get_mlan_asterisk_mini_image
