@@ -1,0 +1,41 @@
+name: Build and Push Asterisk with SCCP
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.yml'
+      - '**.yaml'
+      - '**.Dockerfile'
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Log in to GitLab Docker Registry
+        run: echo "${{ secrets.GITLAB_REGISTRY_PASSWORD }}" | docker login registry.gitlab.com -u "${{ secrets.GITLAB_REGISTRY_USER }}" --password-stdin
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: registry.gitlab.com/futelecom/furegistry/asterisk-sccpb:latest
