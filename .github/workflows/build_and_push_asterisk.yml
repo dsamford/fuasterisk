@@ -50,18 +50,16 @@ jobs:
       - name: Update chan-sccp release if necessary
         id: update_chan_sccp_release
         run: |
-          if [ "${{ env.latest_release }}" != "none" ]; then
-            if [ "${{ env.latest_release }}" != "${{ env.current_release }}" ]; then
-              echo "Updating chan-sccp to version ${{ env.latest_release }}"
-              echo "latest_release=${{ env.latest_release }}" >> $GITHUB_ENV
-              echo "update_chan_sccp_release=true" >> $GITHUB_ENV
-            else
-              echo "No new chan-sccp release"
-              echo "update_chan_sccp_release=false" >> $GITHUB_ENV
+            if [ "${{ env.latest_release }}" != "none" ]; then
+                if [ "${{ env.latest_release }}" != "${{ env.current_release }}" ]; then
+                echo "Updating chan-sccp to version ${{ env.latest_release }}"
+                echo "latest_release=${{ env.latest_release }}" >> $GITHUB_ENV
+                echo "update_chan_sccp_release=true" >> $GITHUB_ENV
+                else
+                echo "No new chan-sccp release"
+                echo "update_chan_sccp_release=false" >> $GITHUB_ENV
+                fi
             fi
-          fi
-          fi
-
       - name: Get latest mlan/asterisk:mini image
         id: get_mlan_asterisk_mini_image
         run: |
