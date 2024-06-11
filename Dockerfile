@@ -21,7 +21,6 @@ RUN apk update && apk add --no-cache \
     alsa-lib \
     alsa-plugins-pulse \
     alsa-utils \
-    festival \
     lua
 
 # Clone, build, and install chan_sccp
