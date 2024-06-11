@@ -52,6 +52,7 @@ RUN cd /usr/src/asterisk && \
     menuselect/menuselect --disable-category MENUSELECT_PBX menuselect.makeopts && \
     menuselect/menuselect --disable-category MENUSELECT_RES menuselect.makeopts && \
     menuselect/menuselect --disable astdb2sqlite3 menuselect.makeopts && \
+    menuselect/menuselect --disable astdb2bdb menuselect.makeopts && \
     menuselect/menuselect --enable res_odbc menuselect.makeopts && \
     menuselect/menuselect --enable res_config_odbc menuselect.makeopts && \
     menuselect/menuselect --enable res_resolver_unbound menuselect.makeopts && \
