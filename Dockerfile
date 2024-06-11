@@ -30,8 +30,10 @@ RUN git clone https://github.com/chan-sccp/chan-sccp.git /usr/src/chan-sccp && \
     make && \
     make install
 
-# Clone Asterisk source code to build additional modules
-RUN git clone -b 16 https://gerrit.asterisk.org/asterisk /usr/src/asterisk
+# Download and extract Asterisk source code
+RUN curl -o /tmp/asterisk.tar.gz https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-20-current.tar.gz && \
+    mkdir -p /usr/src/asterisk && \
+    tar -xzf /tmp/asterisk.tar.gz -C /usr/src/asterisk --strip-components=1
 
 # Build and install additional modules
 RUN cd /usr/src/asterisk && \
