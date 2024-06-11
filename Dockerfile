@@ -26,14 +26,6 @@ RUN apk update && apk add --no-cache \
     openssl-dev \
     wget
 
-# Install Berkeley DB from source
-RUN wget http://download.oracle.com/berkeley-db/db-5.3.28.tar.gz && \
-    tar -xzf db-5.3.28.tar.gz && \
-    cd db-5.3.28/build_unix && \
-    ../dist/configure --prefix=/usr/local && \
-    make && \
-    make install
-
 # Clone, build, and install chan_sccp
 RUN git clone https://github.com/chan-sccp/chan-sccp.git /usr/src/chan-sccp && \
     cd /usr/src/chan-sccp && \
@@ -50,6 +42,16 @@ RUN curl -o /tmp/asterisk.tar.gz https://downloads.asterisk.org/pub/telephony/as
 RUN cd /usr/src/asterisk && \
     ./configure && \
     make menuselect.makeopts && \
+    menuselect/menuselect --disable-category MENUSELECT_APPS menuselect.makeopts && \
+    menuselect/menuselect --disable-category MENUSELECT_CDR menuselect.makeopts && \
+    menuselect/menuselect --disable-category MENUSELECT_CEL menuselect.makeopts && \
+    menuselect/menuselect --disable-category MENUSELECT_CHANNELS menuselect.makeopts && \
+    menuselect/menuselect --disable-category MENUSELECT_CODECS menuselect.makeopts && \
+    menuselect/menuselect --disable-category MENUSELECT_FORMATS menuselect.makeopts && \
+    menuselect/menuselect --disable-category MENUSELECT_FUNCS menuselect.makeopts && \
+    menuselect/menuselect --disable-category MENUSELECT_PBX menuselect.makeopts && \
+    menuselect/menuselect --disable-category MENUSELECT_RES menuselect.makeopts && \
+    menuselect/menuselect --disable astdb2sqlite3 menuselect.makeopts && \
     menuselect/menuselect --enable res_odbc menuselect.makeopts && \
     menuselect/menuselect --enable res_config_odbc menuselect.makeopts && \
     menuselect/menuselect --enable res_resolver_unbound menuselect.makeopts && \
