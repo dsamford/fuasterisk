@@ -30,9 +30,12 @@ RUN curl -o /tmp/asterisk.tar.gz https://downloads.asterisk.org/pub/telephony/as
     mkdir -p /usr/src/asterisk && \
     tar -xzf /tmp/asterisk.tar.gz -C /usr/src/asterisk --strip-components=1
 
-# Build and install Asterisk with additional modules
+# Configure Asterisk
 RUN cd /usr/src/asterisk && \
-    ./configure && \
+    ./configure
+
+# Run menuselect
+RUN cd /usr/src/asterisk && \
     make menuselect.makeopts && \
     menuselect/menuselect --disable astdb2sqlite3 menuselect.makeopts && \
     menuselect/menuselect --disable astdb2bdb menuselect.makeopts && \
@@ -53,7 +56,10 @@ RUN cd /usr/src/asterisk && \
     menuselect/menuselect --enable app_festival menuselect.makeopts && \
     menuselect/menuselect --enable pbx_config menuselect.makeopts && \
     menuselect/menuselect --enable pbx_ael menuselect.makeopts && \
-    menuselect/menuselect --enable res_prometheus menuselect.makeopts && \
+    menuselect/menuselect --enable res_prometheus menuselect.makeopts
+
+# Build and install Asterisk
+RUN cd /usr/src/asterisk && \
     make && \
     make install && \
     make install-headers
