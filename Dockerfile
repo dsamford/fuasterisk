@@ -55,7 +55,8 @@ RUN cd /usr/src/asterisk && \
     menuselect/menuselect --enable pbx_ael menuselect.makeopts && \
     menuselect/menuselect --enable res_prometheus menuselect.makeopts && \
     make && \
-    make install
+    make install \
+    make install-headers
 
 # Clone, build, and install chan_sccp
 RUN git clone https://github.com/chan-sccp/chan-sccp.git /usr/src/chan-sccp && \
