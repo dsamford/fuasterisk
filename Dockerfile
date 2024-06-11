@@ -23,8 +23,16 @@ RUN apk update && apk add --no-cache \
     alsa-utils \
     lua \
     libedit-dev \
-    bdb-dev \
-    openssl-dev
+    openssl-dev \
+    wget
+
+# Install Berkeley DB from source
+RUN wget http://download.oracle.com/berkeley-db/db-5.3.28.tar.gz && \
+    tar -xzf db-5.3.28.tar.gz && \
+    cd db-5.3.28/build_unix && \
+    ../dist/configure --prefix=/usr/local && \
+    make && \
+    make install
 
 # Clone, build, and install chan_sccp
 RUN git clone https://github.com/chan-sccp/chan-sccp.git /usr/src/chan-sccp && \
