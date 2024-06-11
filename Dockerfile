@@ -26,10 +26,13 @@ RUN apk update && apk add --no-cache \
     openssl-dev \
     wget
 
-# Clone, build, and install chan_sccp
-RUN git clone https://github.com/chan-sccp/chan-sccp.git /usr/src/chan-sccp && \
-    cd /usr/src/chan-sccp && \
-    ./configure --with-asterisk=/usr && \
+# Download and build PJProject from source
+RUN wget https://github.com/pjsip/pjproject/archive/refs/tags/2.14.1.tar.gz -O /tmp/pjproject-2.14.1.tar.gz && \
+    mkdir -p /usr/src/pjproject && \
+    tar -xzf /tmp/pjproject-2.14.1.tar.gz -C /usr/src/pjproject --strip-components=1 && \
+    cd /usr/src/pjproject && \
+    ./configure && \
+    make dep && \
     make && \
     make install
 
@@ -38,19 +41,10 @@ RUN curl -o /tmp/asterisk.tar.gz https://downloads.asterisk.org/pub/telephony/as
     mkdir -p /usr/src/asterisk && \
     tar -xzf /tmp/asterisk.tar.gz -C /usr/src/asterisk --strip-components=1
 
-# Build and install additional modules
+# Build and install Asterisk with additional modules
 RUN cd /usr/src/asterisk && \
     ./configure && \
     make menuselect.makeopts && \
-    menuselect/menuselect --disable-category MENUSELECT_APPS menuselect.makeopts && \
-    menuselect/menuselect --disable-category MENUSELECT_CDR menuselect.makeopts && \
-    menuselect/menuselect --disable-category MENUSELECT_CEL menuselect.makeopts && \
-    menuselect/menuselect --disable-category MENUSELECT_CHANNELS menuselect.makeopts && \
-    menuselect/menuselect --disable-category MENUSELECT_CODECS menuselect.makeopts && \
-    menuselect/menuselect --disable-category MENUSELECT_FORMATS menuselect.makeopts && \
-    menuselect/menuselect --disable-category MENUSELECT_FUNCS menuselect.makeopts && \
-    menuselect/menuselect --disable-category MENUSELECT_PBX menuselect.makeopts && \
-    menuselect/menuselect --disable-category MENUSELECT_RES menuselect.makeopts && \
     menuselect/menuselect --disable astdb2sqlite3 menuselect.makeopts && \
     menuselect/menuselect --disable astdb2bdb menuselect.makeopts && \
     menuselect/menuselect --enable res_odbc menuselect.makeopts && \
@@ -71,6 +65,13 @@ RUN cd /usr/src/asterisk && \
     menuselect/menuselect --enable pbx_config menuselect.makeopts && \
     menuselect/menuselect --enable pbx_ael menuselect.makeopts && \
     menuselect/menuselect --enable res_prometheus menuselect.makeopts && \
+    make && \
+    make install
+
+# Clone, build, and install chan_sccp
+RUN git clone https://github.com/chan-sccp/chan-sccp.git /usr/src/chan-sccp && \
+    cd /usr/src/chan-sccp && \
+    ./configure --with-asterisk=/usr && \
     make && \
     make install
 
