@@ -1,40 +1,29 @@
-FROM mlan/asterisk:mini
+FROM ubuntu:latest
 
 # Install necessary packages
-RUN apk update && apk add --no-cache \
-    build-base \
-    linux-headers \
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    linux-headers-$(uname -r) \
     libxml2-dev \
-    ncurses-dev \
-    util-linux-dev \
-    jansson-dev \
-    sqlite-dev \
+    libncurses5-dev \
+    uuid-dev \
+    libjansson-dev \
+    sqlite3 \
+    libsqlite3-dev \
     git \
     autoconf \
     automake \
     libtool \
-    bash \
+    bison \
+    flex \
     unixodbc \
     unixodbc-dev \
-    asterisk-dev \
     curl \
-    alsa-lib \
-    alsa-plugins-pulse \
-    alsa-utils \
-    lua \
+    libasound2-dev \
+    lua5.3 \
     libedit-dev \
-    openssl-dev \
+    libssl-dev \
     wget
-
-# Download and build PJProject from source
-RUN wget https://github.com/pjsip/pjproject/archive/refs/tags/2.14.1.tar.gz -O /tmp/pjproject-2.14.1.tar.gz && \
-    mkdir -p /usr/src/pjproject && \
-    tar -xzf /tmp/pjproject-2.14.1.tar.gz -C /usr/src/pjproject --strip-components=1 && \
-    cd /usr/src/pjproject && \
-    ./configure && \
-    make dep && \
-    make && \
-    make install
 
 # Download and extract Asterisk source code
 RUN curl -o /tmp/asterisk.tar.gz https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-20-current.tar.gz && \
