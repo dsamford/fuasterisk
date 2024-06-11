@@ -3,7 +3,7 @@ FROM ubuntu:latest
 # Install necessary packages
 RUN apt-get update && apt-get install -y \
     build-essential \
-    linux-headers-$(uname -r) \
+    linux-headers-generic \
     libxml2-dev \
     libncurses5-dev \
     uuid-dev \
