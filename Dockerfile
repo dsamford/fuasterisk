@@ -21,7 +21,8 @@ RUN apk update && apk add --no-cache \
     alsa-lib \
     alsa-plugins-pulse \
     alsa-utils \
-    lua
+    lua \
+    libedit-dev
 
 # Clone, build, and install chan_sccp
 RUN git clone https://github.com/chan-sccp/chan-sccp.git /usr/src/chan-sccp && \
