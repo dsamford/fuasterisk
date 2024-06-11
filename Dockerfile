@@ -25,6 +25,10 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     wget
 
+# Create asterisk group and user
+RUN groupadd asterisk && \
+    useradd -r -g asterisk asterisk
+
 # Download and extract Asterisk source code
 RUN curl -o /tmp/asterisk.tar.gz https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-20-current.tar.gz && \
     mkdir -p /usr/src/asterisk && \
